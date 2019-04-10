@@ -1,0 +1,10 @@
+{
+  "name": "db",
+  "connector": "postgresql",
+  "url": "postgres://postgres:example@127.0.0.1:9006/postgres",
+  "host": "127.0.0.1",
+  "port": 9006,
+  "user": "postgres",
+  "password": "example",
+  "database": "postgres"
+}
