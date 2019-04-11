@@ -7,4 +7,5 @@
 ```bash
 curl http://127.0.0.1:3000/shops
 curl http://127.0.0.1:3000/shops/1/products
+curl -X POST -H 'Content-type: application/json' -d '{"name":"curl shop","description":"A shop created from curl"}' http://127.0.0.1:3000/shops
 ```
