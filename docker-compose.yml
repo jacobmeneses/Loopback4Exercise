@@ -10,6 +10,8 @@ services:
     ports:
       - 9006:5432
     volumes:
+      - "./postgres.sql:/docker-entrypoint-initdb.d/01init-database.sql"
+      - "./inserts.sql:/docker-entrypoint-initdb.d/02inserts.sql"
       - "./dbdata:/var/lib/postgresql/data"
 
   adminer:
