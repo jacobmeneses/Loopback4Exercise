@@ -1,14 +1,19 @@
-import {BootMixin} from '@loopback/boot';
+import {BootMixin, Binding, Booter} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
 import {
   RestExplorerBindings,
   RestExplorerComponent,
 } from '@loopback/rest-explorer';
 import {RepositoryMixin} from '@loopback/repository';
-import {RestApplication} from '@loopback/rest';
+import {RestApplication, RestServer, RestBindings} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import * as path from 'path';
+import {MyAuthStrategyProvider} from './providers/auth-strategy.provider';
 import {MySequence} from './sequence';
+import {
+  AuthenticationComponent,
+  AuthenticationBindings,
+} from '@loopback/authentication';
 
 export class FoodApiApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
@@ -16,19 +21,27 @@ export class FoodApiApplication extends BootMixin(
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
+
+    // Set up default home page
+    // this.static('/', path.join(__dirname, '../public'));
+
+    // Customize @loopback/rest-explorer configuration here
+    /*
+    this.bind(RestExplorerBindings.CONFIG).to({
+      path: '/explorer',
+    }); */
+    // this.component(RestExplorerComponent);
+
+    this.projectRoot = __dirname;
+
+    this.component(AuthenticationComponent);
+    this.bind(AuthenticationBindings.STRATEGY).toProvider(
+      MyAuthStrategyProvider,
+    );
+
     // Set up the custom sequence
     this.sequence(MySequence);
 
-    // Set up default home page
-    this.static('/', path.join(__dirname, '../public'));
-
-    // Customize @loopback/rest-explorer configuration here
-    this.bind(RestExplorerBindings.CONFIG).to({
-      path: '/explorer',
-    });
-    this.component(RestExplorerComponent);
-
-    this.projectRoot = __dirname;
     // Customize @loopback/boot Booter Conventions here
     this.bootOptions = {
       controllers: {
@@ -38,5 +51,13 @@ export class FoodApiApplication extends BootMixin(
         nested: true,
       },
     };
+  }
+
+  async start() {
+    await super.start();
+
+    const server = await this.getServer(RestServer);
+    const port = await server.get(RestBindings.PORT);
+    console.log(`REST server running on port: ${port}`);
   }
 }

@@ -1,3 +1,4 @@
+import {inject} from '@loopback/context';
 import {
   Count,
   CountSchema,
@@ -18,11 +19,17 @@ import {
 } from '@loopback/rest';
 import {Shop} from '../models';
 import {ShopRepository} from '../repositories';
+import {
+  AuthenticationBindings,
+  UserProfile,
+  authenticate,
+} from '@loopback/authentication';
 
 export class ShopController {
   constructor(
     @repository(ShopRepository)
     public shopRepository : ShopRepository,
+    @inject(AuthenticationBindings.CURRENT_USER) private user: UserProfile,
   ) {}
 
   @post('/shops', {
@@ -51,6 +58,7 @@ export class ShopController {
     return await this.shopRepository.count(where);
   }
 
+  @authenticate('BasicStrategy')
   @get('/shops', {
     responses: {
       '200': {
